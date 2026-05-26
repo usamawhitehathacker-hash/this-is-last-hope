@@ -1,0 +1,816 @@
+{%- liquid
+  assign cmh_transparent = false
+  if section.settings.cmh_transparent_home and template.name == 'index'
+    assign cmh_transparent = true
+  elsif section.settings.cmh_transparent_collection and template.name == 'collection'
+    assign cmh_transparent = true
+  elsif section.settings.cmh_transparent_product and template.name == 'product'
+    assign cmh_transparent = true
+  endif
+-%}
+
+<div class="cmh-header" role="banner" aria-label="Site header" data-cmh-sticky="{{ section.settings.cmh_sticky_type }}" data-cmh-sticky-state="idle" data-cmh-transparent="{{ cmh_transparent }}">
+  <div class="cmh-header__container">
+    <div class="cmh-header__row" data-cmh-mobile-layout="{{ section.settings.cmh_mobile_layout }}">
+      {%- comment -%} Mobile menu toggle {%- endcomment -%}
+      {%- if section.settings.cmh_show_hamburger -%}
+        <button class="cmh-header__hamburger" aria-label="Menu" aria-expanded="false" type="button">
+          <svg class="cmh-header__hamburger-icon cmh-header__hamburger-icon--{{ section.settings.cmh_icon_style }}" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            {%- if section.settings.cmh_icon_style == 'outline' -%}
+              <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            {%- else -%}
+              <rect x="3" y="5" width="18" height="2" rx="1" fill="currentColor"/>
+              <rect x="3" y="11" width="18" height="2" rx="1" fill="currentColor"/>
+              <rect x="3" y="17" width="18" height="2" rx="1" fill="currentColor"/>
+            {%- endif -%}
+          </svg>
+        </button>
+      {%- endif -%}
+
+      {%- comment -%} Logo {%- endcomment -%}
+      <div class="cmh-header__logo cmh-header__logo--{{ section.settings.cmh_logo_position }}">
+        <a href="{{ section.settings.cmh_logo_link | default: routes.root_url }}" class="cmh-header__logo-link" aria-label="{{ shop.name }}">
+          {%- if section.settings.cmh_logo_image != blank -%}
+            {{ section.settings.cmh_logo_image | image_url: width: 600 | image_tag:
+              class: 'cmh-header__logo-img',
+              loading: 'eager',
+              widths: '100, 150, 200, 250, 300, 400, 500, 600',
+              sizes: '(max-width: 749px) var(--cmh-logo-width-mobile), var(--cmh-logo-width-desktop)'
+            }}
+          {%- else -%}
+            <span class="cmh-header__logo-text">{{ shop.name }}</span>
+          {%- endif -%}
+        </a>
+      </div>
+
+      {%- comment -%} Navigation menu {%- endcomment -%}
+      {%- if section.settings.cmh_menu != blank -%}
+        <nav class="cmh-header__menu cmh-header__menu--{{ section.settings.cmh_menu_position }}" role="navigation" aria-label="Main navigation">
+          <ul class="cmh-header__menu-list" role="menubar">
+            {%- for link in section.settings.cmh_menu.links -%}
+              <li class="cmh-header__menu-item{% if link.links.size > 0 %} cmh-header__menu-item--has-children{% endif %}" role="none">
+                <a
+                  href="{{ link.url }}"
+                  class="cmh-header__menu-link"
+                  role="menuitem"
+                  {% if link.current %} aria-current="page"{% endif %}
+                  {% if link.links.size > 0 %} aria-haspopup="true" aria-expanded="false"{% endif %}
+                >
+                  {{ link.title | escape }}
+                  {%- if link.links.size > 0 -%}
+                    <svg class="cmh-header__menu-caret" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+                      <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  {%- endif -%}
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+      {%- else -%}
+        <nav class="cmh-header__menu cmh-header__menu--{{ section.settings.cmh_menu_position }}" role="navigation" aria-label="Main navigation">
+          <ul class="cmh-header__menu-list" role="menubar">
+            <li class="cmh-header__menu-item" role="none">
+              <a href="#" class="cmh-header__menu-link" role="menuitem">Home</a>
+            </li>
+            <li class="cmh-header__menu-item" role="none">
+              <a href="#" class="cmh-header__menu-link" role="menuitem">Shop</a>
+            </li>
+            <li class="cmh-header__menu-item" role="none">
+              <a href="#" class="cmh-header__menu-link" role="menuitem">About</a>
+            </li>
+            <li class="cmh-header__menu-item" role="none">
+              <a href="#" class="cmh-header__menu-link" role="menuitem">Contact</a>
+            </li>
+          </ul>
+        </nav>
+      {%- endif -%}
+
+      {%- comment -%} Actions placeholder {%- endcomment -%}
+      <div class="cmh-header__actions">
+        <!-- Actions icons already handled by Horizon theme -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --cmh-padding-top: {{ section.settings.cmh_padding_top }}px;
+    --cmh-padding-bottom: {{ section.settings.cmh_padding_bottom }}px;
+    --cmh-separator-color: {{ section.settings.cmh_separator_color }};
+    --cmh-logo-width-desktop: {{ section.settings.cmh_logo_width_desktop }}px;
+    --cmh-logo-width-mobile: {{ section.settings.cmh_logo_width_mobile }}px;
+    --cmh-bg-color: {{ section.settings.cmh_bg_color }};
+    --cmh-text-color: {{ section.settings.cmh_text_color }};
+    --cmh-menu-text-color: {{ section.settings.cmh_menu_text_color }};
+    --cmh-menu-hover-color: {{ section.settings.cmh_menu_hover_color }};
+    --cmh-menu-active-color: {{ section.settings.cmh_menu_active_color }};
+    --cmh-menu-font-size: {{ section.settings.cmh_menu_font_size }}px;
+    --cmh-menu-font-weight: {{ section.settings.cmh_menu_font_weight }};
+    --cmh-menu-letter-spacing: {{ section.settings.cmh_menu_letter_spacing }}px;
+    --cmh-menu-text-transform: {{ section.settings.cmh_menu_text_transform }};
+    --cmh-underline-color: {{ section.settings.cmh_underline_color }};
+    --cmh-underline-thickness: {{ section.settings.cmh_underline_thickness }}px;
+  }
+
+  .cmh-header {
+    position: relative;
+    background-color: var(--cmh-bg-color);
+    color: var(--cmh-text-color);
+    padding-top: var(--cmh-padding-top);
+    padding-bottom: var(--cmh-padding-bottom);
+    z-index: 100;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+
+  .cmh-header__container {
+    max-width: var(--page-width, 1200px);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .cmh-header__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  /* Logo */
+  .cmh-header__logo {
+    flex-shrink: 0;
+  }
+
+  .cmh-header__logo--left {
+    order: 1;
+  }
+
+  .cmh-header__logo--center {
+    order: 2;
+    margin: 0 auto;
+  }
+
+  .cmh-header__logo--right {
+    order: 3;
+    margin-left: auto;
+  }
+
+  .cmh-header__logo-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .cmh-header__logo-img {
+    width: var(--cmh-logo-width-desktop);
+    height: auto;
+    display: block;
+  }
+
+  .cmh-header__logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+
+  /* Menu */
+  .cmh-header__menu {
+    display: none;
+    order: 2;
+  }
+
+  .cmh-header__menu--left {
+    margin-right: auto;
+  }
+
+  .cmh-header__menu--center {
+    margin: 0 auto;
+  }
+
+  .cmh-header__menu--right {
+    margin-left: auto;
+  }
+
+  .cmh-header__menu-list {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 0;
+  }
+
+  .cmh-header__menu-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: var(--cmh-menu-text-color);
+    font-size: var(--cmh-menu-font-size);
+    font-weight: var(--cmh-menu-font-weight);
+    letter-spacing: var(--cmh-menu-letter-spacing);
+    text-transform: var(--cmh-menu-text-transform);
+    transition: color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .cmh-header__menu-link:hover {
+    color: var(--cmh-menu-hover-color);
+  }
+
+  .cmh-header__menu-link[aria-current="page"] {
+    color: var(--cmh-menu-active-color);
+  }
+
+  .cmh-header__menu-caret {
+    width: 10px;
+    height: 6px;
+    transition: transform 0.2s ease;
+  }
+
+  /* Hamburger */
+  .cmh-header__hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: inherit;
+    order: 0;
+  }
+
+  /* Actions */
+  .cmh-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    order: 3;
+  }
+
+  /* Separator */
+  {%- if section.settings.cmh_show_separator -%}
+    .cmh-header {
+      border-bottom: 1px solid var(--cmh-separator-color);
+    }
+  {%- endif -%}
+
+  /* Shadow */
+  {%- if section.settings.cmh_enable_shadow -%}
+    .cmh-header {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+  {%- endif -%}
+
+  /* Desktop styles */
+  @media screen and (min-width: 750px) {
+    .cmh-header__menu {
+      display: block;
+    }
+
+    .cmh-header__hamburger {
+      display: none;
+    }
+
+    .cmh-header__logo-img {
+      width: var(--cmh-logo-width-desktop);
+    }
+  }
+
+  /* Mobile styles */
+  @media screen and (max-width: 749px) {
+    .cmh-header__logo-img {
+      width: var(--cmh-logo-width-mobile);
+    }
+
+    .cmh-header__row[data-cmh-mobile-layout="logo_center"] .cmh-header__logo {
+      order: 2;
+      margin: 0 auto;
+    }
+
+    .cmh-header__row[data-cmh-mobile-layout="logo_center"] .cmh-header__hamburger {
+      order: 1;
+    }
+
+    .cmh-header__row[data-cmh-mobile-layout="logo_center"] .cmh-header__actions {
+      order: 3;
+    }
+
+    .cmh-header__row[data-cmh-mobile-layout="logo_left"] .cmh-header__logo {
+      order: 1;
+    }
+
+    .cmh-header__row[data-cmh-mobile-layout="logo_left"] .cmh-header__hamburger {
+      order: 2;
+      margin-left: auto;
+    }
+
+    .cmh-header__row[data-cmh-mobile-layout="logo_left"] .cmh-header__actions {
+      order: 3;
+    }
+  }
+
+  /* Sticky header */
+  .cmh-header[data-cmh-sticky="always"],
+  .cmh-header[data-cmh-sticky="reduce_logo"],
+  .cmh-header[data-cmh-sticky="on_scroll_up"] {
+    position: sticky;
+    top: 0;
+  }
+
+  .cmh-header[data-cmh-sticky="on_scroll_up"][data-cmh-sticky-state="idle"] {
+    transform: translateY(-100%);
+  }
+
+  .cmh-header[data-cmh-sticky="on_scroll_up"][data-cmh-sticky-state="active"] {
+    transform: translateY(0);
+  }
+
+  .cmh-header[data-cmh-sticky="reduce_logo"][data-cmh-sticky-state="scrolled"] .cmh-header__logo-img {
+    width: calc(var(--cmh-logo-width-desktop) * 0.75);
+    transition: width 0.3s ease;
+  }
+
+  /* Transparent header */
+  .cmh-header[data-cmh-transparent="true"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: transparent;
+    color: {{ section.settings.cmh_transparent_text_color }};
+    border-bottom: none;
+    box-shadow: none;
+  }
+
+  .cmh-header[data-cmh-transparent="true"] .cmh-header__menu-link {
+    color: {{ section.settings.cmh_transparent_text_color }};
+  }
+
+  {% if section.settings.cmh_enable_hover_underline %}
+    /* Hover underline animation */
+    @media screen and (min-width: 750px) {
+      #shopify-section-{{ section.id }} .cmh-header__menu-link {
+        position: relative;
+      }
+
+      #shopify-section-{{ section.id }} .cmh-header__menu-link::after {
+        content: '';
+        position: absolute;
+        bottom: 4px;
+        left: 12px;
+        right: 12px;
+        height: var(--cmh-underline-thickness);
+        background-color: var(--cmh-underline-color);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      #shopify-section-{{ section.id }} .cmh-header__menu-link:hover::after {
+        transform: scaleX(1);
+      }
+
+      #shopify-section-{{ section.id }} .cmh-header__menu-link[aria-current="page"]::after {
+        transform: scaleX(1);
+        background-color: var(--cmh-menu-active-color);
+      }
+    }
+  {% endif %}
+</style>
+
+<script>
+(function() {
+  'use strict';
+
+  var STICKY_TYPE = '{{ section.settings.cmh_sticky_type }}';
+  var SECTION_ID = '{{ section.id }}';
+
+  if (STICKY_TYPE === 'none') return;
+
+  var header = document.querySelector('#shopify-section-' + SECTION_ID + ' .cmh-header');
+  if (!header) return;
+
+  var lastScrollY = 0;
+  var ticking = false;
+  var headerHeight = header.offsetHeight;
+
+  function onScroll() {
+    var currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+    if (STICKY_TYPE === 'on_scroll_up') {
+      if (currentScrollY > headerHeight) {
+        if (currentScrollY < lastScrollY) {
+          header.setAttribute('data-cmh-sticky-state', 'active');
+        } else {
+          header.setAttribute('data-cmh-sticky-state', 'idle');
+        }
+      } else {
+        header.setAttribute('data-cmh-sticky-state', 'idle');
+      }
+    }
+
+    if (STICKY_TYPE === 'always' || STICKY_TYPE === 'reduce_logo') {
+      if (currentScrollY > headerHeight) {
+        header.setAttribute('data-cmh-sticky-state', 'scrolled');
+      } else {
+        header.setAttribute('data-cmh-sticky-state', 'idle');
+      }
+    }
+
+    lastScrollY = currentScrollY;
+    ticking = false;
+  }
+
+  function requestTick() {
+    if (!ticking) {
+      requestAnimationFrame(onScroll);
+      ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', requestTick, { passive: true });
+
+  document.addEventListener('shopify:section:load', function(event) {
+    if (event.detail.sectionId === SECTION_ID) {
+      header = document.querySelector('#shopify-section-' + SECTION_ID + ' .cmh-header');
+      if (header) {
+        headerHeight = header.offsetHeight;
+      }
+    }
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Custom Mega Header",
+  "tag": "header",
+  "class": "cmh-header-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "General layout"
+    },
+    {
+      "type": "select",
+      "id": "cmh_section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "full_width", "label": "Full width" },
+        { "value": "page_width", "label": "Page width" },
+        { "value": "narrow", "label": "Narrow" }
+      ],
+      "default": "page_width"
+    },
+    {
+      "type": "select",
+      "id": "cmh_section_height",
+      "label": "Section height",
+      "options": [
+        { "value": "compact", "label": "Compact" },
+        { "value": "standard", "label": "Standard" }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "range",
+      "id": "cmh_padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "cmh_padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "checkbox",
+      "id": "cmh_enable_shadow",
+      "label": "Enable shadow",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "cmh_show_separator",
+      "label": "Show separator line",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "cmh_separator_color",
+      "label": "Separator color",
+      "default": "#E5E5E5"
+    },
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "cmh_logo_image",
+      "label": "Logo image"
+    },
+    {
+      "type": "select",
+      "id": "cmh_logo_position",
+      "label": "Logo position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "cmh_logo_width_desktop",
+      "label": "Logo width (desktop)",
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "cmh_logo_width_mobile",
+      "label": "Logo width (mobile)",
+      "min": 30,
+      "max": 150,
+      "step": 10,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "url",
+      "id": "cmh_logo_link",
+      "label": "Logo link"
+    },
+    {
+      "type": "header",
+      "content": "Sticky header"
+    },
+    {
+      "type": "select",
+      "id": "cmh_sticky_type",
+      "label": "Sticky behavior",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "on_scroll_up", "label": "On scroll up" },
+        { "value": "always", "label": "Always" },
+        { "value": "reduce_logo", "label": "Always - reduce logo" }
+      ],
+      "default": "on_scroll_up"
+    },
+    {
+      "type": "header",
+      "content": "Mobile"
+    },
+    {
+      "type": "select",
+      "id": "cmh_mobile_layout",
+      "label": "Mobile layout",
+      "options": [
+        { "value": "logo_left", "label": "Logo left, icons right" },
+        { "value": "logo_center", "label": "Logo center" }
+      ],
+      "default": "logo_left"
+    },
+    {
+      "type": "select",
+      "id": "cmh_icon_style",
+      "label": "Icon style",
+      "options": [
+        { "value": "outline", "label": "Outline" },
+        { "value": "filled", "label": "Filled" }
+      ],
+      "default": "outline"
+    },
+    {
+      "type": "checkbox",
+      "id": "cmh_show_hamburger",
+      "label": "Show mobile menu toggle",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "cmh_menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "select",
+      "id": "cmh_menu_position",
+      "label": "Menu position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "cmh_menu_row",
+      "label": "Menu row",
+      "options": [
+        { "value": "inline", "label": "Inline with logo" },
+        { "value": "below", "label": "Below header" }
+      ],
+      "default": "inline"
+    },
+    {
+      "type": "checkbox",
+      "id": "cmh_enable_hover_underline",
+      "label": "Enable hover underline",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "cmh_underline_color",
+      "label": "Underline color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "cmh_underline_thickness",
+      "label": "Underline thickness",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "Transparent header"
+    },
+    {
+      "type": "checkbox",
+      "id": "cmh_transparent_home",
+      "label": "Enable on homepage",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "cmh_transparent_collection",
+      "label": "Enable on collection pages",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "cmh_transparent_product",
+      "label": "Enable on product pages",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "cmh_transparent_text_color",
+      "label": "Text color (transparent mode)",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "cmh_bg_color",
+      "label": "Background color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cmh_text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "cmh_menu_text_color",
+      "label": "Menu link color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "cmh_menu_hover_color",
+      "label": "Menu link hover color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "cmh_menu_active_color",
+      "label": "Menu active link color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "select",
+      "id": "cmh_menu_font_family",
+      "label": "Menu font",
+      "options": [
+        { "value": "inherit", "label": "Theme default" },
+        { "value": "heading", "label": "Heading font" },
+        { "value": "body", "label": "Body font" }
+      ],
+      "default": "inherit"
+    },
+    {
+      "type": "select",
+      "id": "cmh_menu_font_weight",
+      "label": "Menu font weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "range",
+      "id": "cmh_menu_font_size",
+      "label": "Menu font size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "cmh_menu_letter_spacing",
+      "label": "Menu letter spacing",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "cmh_menu_text_transform",
+      "label": "Menu text transform",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "uppercase", "label": "Uppercase" },
+        { "value": "lowercase", "label": "Lowercase" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "cmh_logo_font_family",
+      "label": "Logo text font",
+      "options": [
+        { "value": "inherit", "label": "Theme default" },
+        { "value": "heading", "label": "Heading font" },
+        { "value": "body", "label": "Body font" }
+      ],
+      "default": "heading"
+    },
+    {
+      "type": "select",
+      "id": "cmh_logo_font_weight",
+      "label": "Logo text font weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" },
+        { "value": "800", "label": "Extra Bold" }
+      ],
+      "default": "700"
+    }
+  ],
+  "blocks": [],
+  "presets": [
+    {
+      "name": "Custom Mega Header"
+    }
+  ]
+}
+{% endschema %}
